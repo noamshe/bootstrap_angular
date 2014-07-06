@@ -1,0 +1,107 @@
+<!doctype html>
+<html ng-app="plunker">
+  <head>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular.js"></script>
+    <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.11.0.js"></script>
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+	<div ng-controller="AlertDemoCtrl">
+	  <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+	  <button class='btn btn-default' ng-click="addAlert()">Add Alert</button>
+	</div>
+	<div ng-controller="CollapseDemoCtrl">
+		<button class="btn btn-default" ng-click="isCollapsed = !isCollapsed">Toggle collapse</button>
+		<hr>
+		<div collapse="isCollapsed">
+			<div class="well well-lg">Some content</div> 
+		</div>
+	</div>
+	<div ng-controller="ModalDemoCtrl">
+		<script type="text/ng-template" id="myModalContent.html">
+			<div class="modal-header">
+				<h3 class="modal-title">I'm a modal!</h3>
+			</div>
+			<div class="modal-body">
+				<ul>
+					<li ng-repeat="item in items">
+						<a ng-click="selected.item = item">{{ item }}</a>
+					</li>
+				</ul>
+				Selected: <b>{{ selected.item }}</b>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary" ng-click="ok()">OK</button>
+				<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+			</div>
+		</script>
+
+		<button class="btn btn-default" ng-click="open()">Open me!</button>
+		<button class="btn btn-default" ng-click="open('lg')">Large modal</button>
+		<button class="btn btn-default" ng-click="open('sm')">Small modal</button>
+		<div ng-show="selected">Selection from a modal: {{ selected }}</div>
+	</div>
+  </body>
+</html>
+<script>
+	angular.module('plunker', ['ui.bootstrap']);
+	function CollapseDemoCtrl($scope) {
+		$scope.isCollapsed = false;
+	}
+	function AlertDemoCtrl($scope) {
+	  $scope.alerts = [
+		{ type: 'danger', msg: 'Oh snap! Change a few things up and try submitting again.' },
+		{ type: 'success', msg: 'Well done! You successfully read this important alert message.' }
+	  ];
+
+	  $scope.addAlert = function() {
+		$scope.alerts.push({msg: 'Another alert!'});
+	  };
+
+	  $scope.closeAlert = function(index) {
+		$scope.alerts.splice(index, 1);
+	  };
+}
+var ModalDemoCtrl = function ($scope, $modal, $log) {
+
+  $scope.items = ['item1', 'item2', 'item3'];
+
+  $scope.open = function (size) {
+
+    var modalInstance = $modal.open({
+      templateUrl: 'myModalContent.html',
+      controller: ModalInstanceCtrl,
+      size: size,
+      resolve: {
+        items: function () {
+          return $scope.items;
+        }
+      }
+    });
+
+    modalInstance.result.then(function (selectedItem) {
+      $scope.selected = selectedItem;
+    }, function () {
+      $log.info('Modal dismissed at: ' + new Date());
+    });
+  };
+};
+
+// Please note that $modalInstance represents a modal window (instance) dependency.
+// It is not the same as the $modal service used above.
+var ModalInstanceCtrl = function ($scope, $modalInstance, items) {
+
+  $scope.items = items;
+  $scope.selected = {
+    item: $scope.items[0]
+  };
+
+  $scope.ok = function () {
+    $modalInstance.close($scope.selected.item);
+  };
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss('cancel');
+  };
+};
+</script>
